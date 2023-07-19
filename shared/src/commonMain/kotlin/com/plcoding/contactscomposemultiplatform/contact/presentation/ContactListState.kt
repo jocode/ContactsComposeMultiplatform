@@ -8,7 +8,7 @@ data class ContactListState(
     val selectedContact: Contact? = null,
     val isAddContactSheetOpen: Boolean = false,
     val isContactDetailsSheetOpen: Boolean = false,
-    val usSelectedContactSheetOpen: Boolean = false,
+    val isSelectedContactSheetOpen: Boolean = false,
     val firstNameError: String? = null,
     val lastNameError: String? = null,
     val emailError: String? = null,
