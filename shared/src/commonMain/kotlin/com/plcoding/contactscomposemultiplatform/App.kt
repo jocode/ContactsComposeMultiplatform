@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import com.plcoding.contactscomposemultiplatform.contact.presentation.ContactListScreen
 import com.plcoding.contactscomposemultiplatform.contact.presentation.ContactListViewModel
 import com.plcoding.contactscomposemultiplatform.core.presentation.ContactsTheme
+import com.plcoding.contactscomposemultiplatform.core.presentation.ImagePicker
 import com.plcoding.contactscomposemultiplatform.di.AppModule
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
@@ -18,7 +19,8 @@ import dev.icerock.moko.mvvm.compose.viewModelFactory
 fun App(
     darkTheme: Boolean,
     dynamicColor: Boolean,
-    appModule: AppModule
+    appModule: AppModule,
+    imagePicker: ImagePicker
 ) {
 
     val viewModel = getViewModel(
@@ -40,7 +42,8 @@ fun App(
             ContactListScreen(
                 state = state,
                 newContact = viewModel.newContact,
-                onEvent = viewModel::onEvent
+                onEvent = viewModel::onEvent,
+                imagePicker = imagePicker
             )
         }
     }

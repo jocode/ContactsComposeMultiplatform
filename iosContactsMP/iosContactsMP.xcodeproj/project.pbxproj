@@ -61,7 +61,6 @@
 			children = (
 				7555FF7D242A565900829871 /* iosContactsMP */,
 				7555FF7C242A565900829871 /* Products */,
-				7555FFB0242A642200829871 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -84,13 +83,6 @@
 				FD56D8B52A677F9200E1E0FF /* ComposeView.swift */,
 			);
 			path = iosContactsMP;
-			sourceTree = "<group>";
-		};
-		7555FFB0242A642200829871 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -330,6 +322,7 @@
 					"$(inherited)",
 					"-framework",
 					shared,
+					"-lsqlite3",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.iosContactsMP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -358,6 +351,7 @@
 					"$(inherited)",
 					"-framework",
 					shared,
+					"-lsqlite3",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.iosContactsMP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
