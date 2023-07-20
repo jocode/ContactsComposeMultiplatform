@@ -2,17 +2,21 @@ package com.plcoding.contactscomposemultiplatform.contact.data
 
 import com.plcoding.contactscomposemultiplatform.contact.domain.Contact
 import com.plcoding.contactscomposemultiplatform.contact.domain.ContactDataSource
+import com.plcoding.contactscomposemultiplatform.core.data.ImageStorage
 import com.plcoding.contactscomposemultiplatform.database.ContactsDatabase
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.Clock
 
 class SQLDelightContactDataSource(
-    db: ContactsDatabase
-): ContactDataSource {
+    db: ContactsDatabase,
+    private val imageStorage: ImageStorage
+) : ContactDataSource {
 
     private val queries = db.contactQueries
 
@@ -21,9 +25,13 @@ class SQLDelightContactDataSource(
             .getContacts()
             .asFlow()
             .mapToList()
-            .map {
-                it.map { contactEntity ->
-                    contactEntity.toContact()
+            .map { contactEntities ->
+                supervisorScope {
+                    contactEntities
+                        .map { contactEntity ->
+                            async { contactEntity.toContact(imageStorage) }
+                        }
+                        .map { it.await() }
                 }
             }
     }
@@ -33,9 +41,13 @@ class SQLDelightContactDataSource(
             .getRecentContacts(amount.toLong())
             .asFlow()
             .mapToList()
-            .map {
-                it.map { contactEntity ->
-                    contactEntity.toContact()
+            .map { contactEntities ->
+                supervisorScope {
+                    contactEntities
+                        .map { contactEntity ->
+                            async { contactEntity.toContact(imageStorage) }
+                        }
+                        .map { it.await() }
                 }
             }
     }
@@ -46,11 +58,15 @@ class SQLDelightContactDataSource(
             .asFlow()
             .mapToOneOrNull()
             .map { contactEntity ->
-                contactEntity?.toContact()
+                contactEntity?.toContact(imageStorage)
             }
     }
 
     override suspend fun insertContact(contact: Contact) {
+        val imagePath = contact.photoBytes?.let {
+            imageStorage.saveImage(it)
+        }
+
         queries.insertContact(
             id = contact.id,
             firstName = contact.firstName,
@@ -58,11 +74,15 @@ class SQLDelightContactDataSource(
             phoneNumber = contact.phoneNumber,
             email = contact.email,
             createdAt = Clock.System.now().epochSeconds,
-            imagePath = null
+            imagePath = imagePath
         )
     }
 
     override suspend fun deleteContact(id: Long) {
+        val entity = queries.getContactById(id).executeAsOne()
+        entity.imagePath?.let {
+            imageStorage.deleteImage(it)
+        }
         queries.deleteContact(id)
     }
 }

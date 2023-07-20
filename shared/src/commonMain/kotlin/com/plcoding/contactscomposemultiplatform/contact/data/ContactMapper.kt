@@ -1,9 +1,10 @@
 package com.plcoding.contactscomposemultiplatform.contact.data
 
 import com.plcoding.contactscomposemultiplatform.contact.domain.Contact
+import com.plcoding.contactscomposemultiplatform.core.data.ImageStorage
 import database.ContactEntity
 
-fun ContactEntity.toContact(): Contact {
+suspend fun ContactEntity.toContact(imageStorage: ImageStorage): Contact {
 
     return Contact(
         id = id,
@@ -11,6 +12,6 @@ fun ContactEntity.toContact(): Contact {
         lastName = lastName,
         phoneNumber = phoneNumber,
         email = email,
-        photoBytes = null // TODO: Get the image
+        photoBytes = imagePath?.let { imageStorage.getImage(it) },
     )
 }
